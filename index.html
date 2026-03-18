@@ -389,6 +389,66 @@
     .cta-banner-buttons { flex-direction: column; }
     .reviews-header { flex-direction: column; align-items: flex-start; gap: 16px; }
   }
+
+  /* ==================== QUOTE MODAL ==================== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--dark-card); border: 1px solid rgba(245,183,49,0.15);
+    border-radius: 20px; padding: 40px; max-width: 500px; width: 100%;
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: none; border: none;
+    color: var(--gray-text); font-size: 24px; cursor: pointer; line-height: 1;
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; transition: all 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+  .modal-box h2 {
+    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .modal-box .modal-sub { color: var(--gray-text); font-size: 14px; margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04); color: var(--white); font-size: 15px;
+    font-family: 'Inter', sans-serif; transition: border-color 0.2s; outline: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--gold);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder {
+    color: rgba(255,255,255,0.25);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group select option { background: var(--dark-card); color: var(--white); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-submit {
+    width: 100%; padding: 16px; background: var(--gold); color: var(--black);
+    border: none; border-radius: 10px; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px; font-family: 'Inter', sans-serif;
+  }
+  .form-submit:hover { background: var(--gold-dark); transform: translateY(-1px); }
+  .form-success {
+    display: none; text-align: center; padding: 40px 20px;
+  }
+  .form-success svg { color: var(--gold); margin-bottom: 16px; }
+  .form-success h3 { font-family: 'Oswald', sans-serif; font-size: 24px; margin-bottom: 8px; }
+  .form-success p { color: var(--gray-text); font-size: 15px; }
+  @media (max-width: 768px) {
+    .modal-box { padding: 28px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -754,7 +814,7 @@
     <h2>Your Car Deserves Better Than A Drive-Through Wash</h2>
     <p>Book your detail in 60 seconds. We'll handle the rest.</p>
     <div class="cta-banner-buttons">
-      <a href="#" class="btn-primary">
+      <a href="javascript:void(0)" onclick="openQuoteModal()" class="btn-primary">
         Book Online Now
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
@@ -814,8 +874,104 @@
 <!-- ==================== STICKY MOBILE CTA ==================== -->
 <div class="mobile-cta">
   <a href="tel:+15404805942" class="m-call">Call Now</a>
-  <a href="#book" class="m-book">Book Online</a>
+  <a href="javascript:void(0)" onclick="openQuoteModal()" class="m-book">Book Online</a>
 </div>
+
+<!-- ==================== QUOTE MODAL ==================== -->
+<div class="modal-overlay" id="quoteModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeQuoteModal()">&times;</button>
+
+    <div id="quoteForm">
+      <h2>Get Your Free Quote</h2>
+      <p class="modal-sub">Fill out this short form and we'll get back to you within a few hours.</p>
+
+      <form onsubmit="submitQuoteForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" placeholder="John" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" placeholder="Smith" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" placeholder="john@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" placeholder="(540) 555-1234" required>
+        </div>
+
+        <div class="form-group">
+          <label>What is your vehicle? (Make, Year, Model) *</label>
+          <textarea placeholder="e.g. 2022 Honda CR-V" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Which package are you interested in?</label>
+          <select>
+            <option value="">Select a package...</option>
+            <option value="essential">Essential Clean - $200</option>
+            <option value="deluxe">Deluxe Detail - $250</option>
+            <option value="ultimate">Ultimate Protection - $350</option>
+            <option value="unsure">Not sure yet</option>
+          </select>
+        </div>
+
+        <button type="submit" class="form-submit">Submit for Your Free Quote</button>
+      </form>
+    </div>
+
+    <div class="form-success" id="quoteSuccess">
+      <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9" stroke-width="2"/></svg>
+      <h3>Thank You!</h3>
+      <p>We received your quote request and will get back to you within a few hours. Talk soon!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function openQuoteModal() {
+  document.getElementById('quoteModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeQuoteModal() {
+  document.getElementById('quoteModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+function submitQuoteForm(e) {
+  e.preventDefault();
+  document.getElementById('quoteForm').style.display = 'none';
+  document.getElementById('quoteSuccess').style.display = 'block';
+  setTimeout(function() {
+    closeQuoteModal();
+    document.getElementById('quoteForm').style.display = 'block';
+    document.getElementById('quoteSuccess').style.display = 'none';
+  }, 4000);
+}
+// Close modal on overlay click
+document.getElementById('quoteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeQuoteModal();
+});
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeQuoteModal();
+});
+// Wire up all quote/book buttons
+document.querySelectorAll('a[href="#book"], .nav-cta').forEach(function(el) {
+  el.href = 'javascript:void(0)';
+  el.addEventListener('click', function(e) {
+    e.preventDefault();
+    openQuoteModal();
+  });
+});
+</script>
 
 </body>
 </html>
